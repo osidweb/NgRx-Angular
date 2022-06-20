@@ -1,0 +1,80 @@
+<div class="notificator-page">
+
+  <app-floating-controls [notifications]="notifications"></app-floating-controls>
+
+  <h1 class="notificator-page-title">
+    {{'notificator.header' | translate}}
+  </h1>
+
+  <div
+    class="loading-notifications-progress"
+    *ngIf="isLoading$ | async"
+  >
+    <app-progress-point></app-progress-point>
+  </div>
+
+  <!-- все уведомления -->
+  <ng-container *ngIf="(isLoading$ | async) === false">
+    <ng-container *ngIf="notifications !== null; else emptyNotifications">
+
+      <!-- срочные уведомления -->
+      <div class="notifications-wrap"
+          *ngIf="urgentNotifications?.length"
+      >
+        <h5 class="notifications-wrap-title"
+            *ngIf="normalNotifications.length"
+        >
+          {{'notificator.notifications_wrap.ifUrgent_header' | translate}}
+          ({{ urgentNotifications.length }})
+        </h5>
+
+        <ul class="notifications" [class.updating]="isUpdatingNotifications">
+          <app-notification
+            *ngFor="let notification of urgentNotifications | sortBy: 'entryOrder':'desc'; trackBy: trackByFn"
+            [notification]="notification"
+            [mainDoc]="mainDoc?.unid === notification.parentUnid ? mainDoc : undefined"
+            [comments]="comments"
+          ></app-notification>
+        </ul>
+      </div>
+
+      <!-- обычные уведомления -->
+      <div
+        class="notifications-wrap"
+        *ngIf="normalNotifications?.length">
+        <h5
+          class="notifications-wrap-title"
+          *ngIf="urgentNotifications.length"
+        >
+          {{'notificator.notifications_wrap.ifUrgent_header_otherMsg' | translate}}
+          ({{ normalNotifications.length }})
+        </h5>
+        <ul
+          class="notifications"
+          [class.updating]="isUpdatingNotifications"
+        >
+          <app-notification
+            *ngFor="let notification of normalNotifications | sortBy: 'entryOrder':'desc'; trackBy: trackByFn"
+            [notification]="notification"
+            [mainDoc]="mainDoc?.unid === notification.parentUnid ? mainDoc : undefined"
+            [comments]="comments"
+          ></app-notification>
+        </ul>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <!-- нет уведомлений -->
+  <ng-template #emptyNotifications>
+    <div class="empty-notification">
+      <div class="empty-notification-icon-wrap">
+        <mat-icon svgIcon="notificator:notifications_none"></mat-icon>
+      </div>
+      <div class="empty-notification-label">
+        {{'notificator.empty_notification' | translate}}
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+
